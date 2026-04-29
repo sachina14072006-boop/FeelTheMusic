@@ -7,8 +7,7 @@
 ## Live Deployment
 
 - **Frontend:** https://client-beta-wheat-71.vercel.app
-- **Backend API:** https://feelthemusic-backend-production.up.railway.app
-- **Emotion Service:** https://feelthemusic-emotion-production.up.railway.app
+
 
 
 ## Key Features
