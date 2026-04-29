@@ -1,424 +1,148 @@
 FeelTheMusic Deployment Guide
 =============================
 
-This guide documents what was changed, how the project was deployed, where each service is hosted, and how to maintain or redeploy the application.
+This is the short deployment summary for FeelTheMusic.
 
 
-1. Project Summary
-------------------
-
-FeelTheMusic is a full-stack music recommendation application with these parts:
-
-- React/Vite frontend in the client/ folder
-- Node.js/Express backend in the server/ folder
-- MySQL database using database/schema.sql and database/seed.sql
-- Python/FastAPI emotion detection service in the emotion-service/ folder
-
-
-2. Final Live Deployment URLs
------------------------------
+1. Deployed Services
+--------------------
 
 Frontend:
-https://client-beta-wheat-71.vercel.app
+- React + Vite
+- Folder: client/
+- Platform: Vercel
+- URL: https://client-beta-wheat-71.vercel.app
 
-Backend API:
-https://feelthemusic-backend-production.up.railway.app
+Backend:
+- Node.js + Express
+- Folder: server/
+- Platform: Railway
+- URL: https://feelthemusic-backend-production.up.railway.app
 
-Emotion service:
-https://feelthemusic-emotion-production.up.railway.app
+Database:
+- MySQL
+- Platform: Railway MySQL
+- SQL files used: database/schema.sql and database/seed.sql
 
-GitHub repository:
+Emotion Service:
+- Python + FastAPI + DeepFace
+- Folder: emotion-service/
+- Platform: Railway
+- URL: https://feelthemusic-emotion-production.up.railway.app
+
+GitHub:
 https://github.com/sachina14072006-boop/FeelTheMusic.git
 
 
-3. Hosting Platforms Used
--------------------------
+2. Main Changes Before Deployment
+---------------------------------
 
-Frontend hosting:
-Vercel
-
-Backend hosting:
-Railway
-
-Database hosting:
-Railway MySQL
-
-Emotion service hosting:
-Railway
+- Cleaned the project and renamed it to FeelTheMusic.
+- Added a production .gitignore.
+- Added .env.example files.
+- Created MySQL schema and seed data.
+- Replaced localhost API URLs with Vite environment variables.
+- Improved webcam video size and alignment.
+- Added a Dockerfile for the emotion service so OpenCV works on Railway.
 
 
-4. Work Completed Before Deployment
------------------------------------
+3. Important Environment Variables
+----------------------------------
 
-Project rename and cleanup:
-
-- Updated project naming to FeelTheMusic.
-- Updated frontend package name to feelthemusic-client.
-- Updated backend lockfile metadata to feelthemusic-server.
-- Rewrote README.md with professional project documentation.
-- Created a production-ready .gitignore.
-- Added .env.example files for frontend and backend.
-- Pushed the cleaned project to GitHub.
-
-Database fix:
-
-- Found that the backend could connect to MySQL, but registration failed because the SQL schema files were empty.
-- Added database/schema.sql with all tables required by the backend controllers.
-- Added database/seed.sql with emotions, artists, songs, and song-emotion recommendation mappings.
-- Applied the schema and seed data locally and later to Railway MySQL.
-
-Frontend deployment prep:
-
-- Replaced hardcoded backend localhost URL in client/src/services/api.js.
-- Replaced hardcoded emotion service localhost URL in client/src/components/WebcamDetector.jsx.
-- Added Vite environment variables:
-  - VITE_API_URL
-  - VITE_EMOTION_API_URL
-
-Webcam UI improvement:
-
-- Increased webcam video size.
-- Centered the webcam card content.
-- Added a stable 16:9 video frame.
-
-Emotion service deployment fix:
-
-- Replaced opencv-python with opencv-python-headless in emotion-service/requirements.txt.
-- Added emotion-service/Dockerfile to install Linux runtime libraries needed by OpenCV.
-- Used Python 3.11 slim image for a more stable cloud runtime.
-
-
-5. Important Files Added or Updated
------------------------------------
-
-Documentation:
-
-- README.md
-- DEPLOYMENT_GUIDE.txt
-
-Git and environment:
-
-- .gitignore
-- client/.env.example
-- server/.env.example
-
-Frontend:
-
-- client/src/services/api.js
-- client/src/components/WebcamDetector.jsx
-- client/src/index.css
-
-Database:
-
-- database/schema.sql
-- database/seed.sql
-
-Emotion service:
-
-- emotion-service/requirements.txt
-- emotion-service/Dockerfile
-
-
-6. Environment Variables
-------------------------
-
-Frontend environment variables used on Vercel:
+Frontend on Vercel:
 
 VITE_API_URL=https://feelthemusic-backend-production.up.railway.app/api
 VITE_EMOTION_API_URL=https://feelthemusic-emotion-production.up.railway.app
 
-Backend environment variables used on Railway:
+Backend on Railway:
 
 DB_HOST=mysql.railway.internal
 DB_USER=root
-DB_PASSWORD=<Railway MySQL password>
+DB_PASSWORD=<stored in Railway>
 DB_NAME=railway
-JWT_SECRET=<production JWT secret>
+JWT_SECRET=<stored in Railway>
 
-Important:
-Never commit real .env files or secrets to GitHub. Only commit .env.example files.
+Real secrets are stored only in Railway/Vercel, not in GitHub.
 
 
-7. Railway Deployment Steps Used
---------------------------------
+4. Deployment Commands Used
+---------------------------
 
-Step 1: Logged in to Railway CLI.
+Backend:
 
-Command:
-railway login
-
-Step 2: Created a Railway project.
-
-Command:
-railway init -n FeelTheMusic --json
-
-Created Railway project:
-FeelTheMusic
-
-Step 3: Added Railway MySQL.
-
-Command:
-railway add --database mysql --json
-
-Created service:
-MySQL
-
-Step 4: Added backend service.
-
-Command:
-railway add --service feelthemusic-backend --json
-
-Created service:
-feelthemusic-backend
-
-Step 5: Added emotion service.
-
-Command:
-railway add --service feelthemusic-emotion --json
-
-Created service:
-feelthemusic-emotion
-
-Step 6: Set backend environment variables.
-
-Command pattern:
-railway variable set DB_HOST=<host> DB_USER=<user> DB_PASSWORD=<password> DB_NAME=<database> JWT_SECRET=<secret> --service feelthemusic-backend --skip-deploys
-
-Step 7: Deployed backend from the server/ folder.
-
-Command:
 railway up server --service feelthemusic-backend --path-as-root --detach --message "Deploy FeelTheMusic backend"
 
-Step 8: Generated backend public domain.
+Emotion service:
 
-Command:
-railway domain --service feelthemusic-backend --port 5000 --json
-
-Generated backend URL:
-https://feelthemusic-backend-production.up.railway.app
-
-Step 9: Applied database schema and seed data to Railway MySQL.
-
-The installed MySQL CLI on the machine was too old for Railway MySQL authentication, so the schema was applied using the Node.js mysql2 driver from the server dependencies.
-
-Command pattern used:
-node -e "const fs=require('fs'); const mysql=require('mysql2/promise'); (async()=>{const c=await mysql.createConnection({host:'<public-host>',port:<public-port>,user:'root',password:'<password>',database:'railway',multipleStatements:true}); await c.query(fs.readFileSync('../database/schema.sql','utf8')); await c.query(fs.readFileSync('../database/seed.sql','utf8')); await c.end(); console.log('Railway schema and seed applied');})().catch(e=>{console.error(e.message); process.exit(1);});"
-
-Step 10: Set emotion service start command.
-
-Command:
-railway variable set "NIXPACKS_START_CMD=uvicorn main:app --host 0.0.0.0 --port $PORT" --service feelthemusic-emotion --skip-deploys
-
-Later, this was replaced effectively by using a Dockerfile.
-
-Step 11: Deployed emotion service from the emotion-service/ folder.
-
-Initial command:
 railway up emotion-service --service feelthemusic-emotion --path-as-root --detach --message "Deploy FeelTheMusic emotion service"
 
-Step 12: Fixed emotion service crash.
+Frontend:
 
-Problem:
-The first emotion service deployment crashed with this error:
-ImportError: libxcb.so.1: cannot open shared object file: No such file or directory
-
-Cause:
-OpenCV needed Linux runtime libraries that were missing from Railway's default Python image.
-
-Fix:
-Created emotion-service/Dockerfile and installed:
-- libgl1
-- libglib2.0-0
-- libsm6
-- libxext6
-- libxcb1
-
-Redeploy command:
-railway up emotion-service --service feelthemusic-emotion --path-as-root --detach --message "Fix emotion service runtime libraries"
-
-Step 13: Generated emotion service public domain.
-
-Command:
-railway domain --service feelthemusic-emotion --port 8000 --json
-
-Generated emotion service URL:
-https://feelthemusic-emotion-production.up.railway.app
-
-
-8. Vercel Deployment Steps Used
--------------------------------
-
-Step 1: Logged in to Vercel CLI.
-
-Command:
-vercel login
-
-Step 2: Deployed the frontend from the client/ folder.
-
-Vercel required an explicit account scope in non-interactive mode.
-
-Command:
 vercel deploy client --prod --yes --scope sachina14072006-8002s-projects --build-env VITE_API_URL=https://feelthemusic-backend-production.up.railway.app/api --build-env VITE_EMOTION_API_URL=https://feelthemusic-emotion-production.up.railway.app
 
-Vercel detected the app as a Vite project.
 
-Generated frontend URLs:
+5. Database Setup
+-----------------
 
-Production deployment:
-https://client-9hriokaen-sachina14072006-8002s-projects.vercel.app
+The Railway MySQL database was initialized with:
 
-Production alias:
-https://client-beta-wheat-71.vercel.app
+- database/schema.sql
+- database/seed.sql
 
-The alias is the cleaner URL to share.
-
-
-9. Verification Performed
--------------------------
-
-Frontend verification:
-
-Command:
-Invoke-WebRequest https://client-beta-wheat-71.vercel.app -UseBasicParsing
-
-Expected result:
-StatusCode 200
-
-Backend verification:
-
-Command:
-Invoke-RestMethod https://feelthemusic-backend-production.up.railway.app/
-
-Expected response:
-FeelTheMusic backend is running
-
-Backend database verification:
-
-Command:
-Invoke-RestMethod https://feelthemusic-backend-production.up.railway.app/api/emotions
-
-Expected result:
-Returns emotions such as Happy, Sad, Calm, and Energetic.
-
-Recommendation endpoint verification:
-
-Command:
-Invoke-RestMethod https://feelthemusic-backend-production.up.railway.app/api/songs/recommendations/1
-
-Expected result:
-Returns seeded recommended songs for the Happy emotion.
-
-Emotion service verification:
-
-Command:
-Invoke-RestMethod https://feelthemusic-emotion-production.up.railway.app/
-
-Expected response:
-Emotion service is running
+These files create and populate users, songs, artists, emotions, playlists, ratings, mood logs, and recommendation mappings.
 
 
-10. GitHub Commits Created
---------------------------
+6. Important Fix
+----------------
 
-Deployment preparation commit:
-b5baa21 chore: prepare services for deployment
+The emotion service first failed because OpenCV needed Linux runtime libraries.
 
-Emotion service deployment fix commit:
-5e6734e fix: deploy emotion service with runtime libraries
+Fix:
+- Changed opencv-python to opencv-python-headless.
+- Added emotion-service/Dockerfile.
+- Installed required packages like libgl1, libglib2.0-0, libsm6, libxext6, and libxcb1.
 
 
-11. How to Redeploy Later
--------------------------
+7. Final Verification
+---------------------
 
-Redeploy backend:
+Frontend:
+- Opened successfully with 200 OK.
 
+Backend:
+- Returned: FeelTheMusic backend is running.
+
+Emotion service:
+- Returned: Emotion service is running.
+
+Database:
+- Backend successfully returned emotions, songs, and recommendations from Railway MySQL.
+
+
+8. Redeploy Commands
+--------------------
+
+Backend:
 railway up server --service feelthemusic-backend --path-as-root --detach --message "Redeploy backend"
 
-Redeploy emotion service:
-
+Emotion service:
 railway up emotion-service --service feelthemusic-emotion --path-as-root --detach --message "Redeploy emotion service"
 
-Redeploy frontend:
-
+Frontend:
 vercel deploy client --prod --yes --scope sachina14072006-8002s-projects --build-env VITE_API_URL=https://feelthemusic-backend-production.up.railway.app/api --build-env VITE_EMOTION_API_URL=https://feelthemusic-emotion-production.up.railway.app
 
 
-12. How to Update Database Again
---------------------------------
+9. Quick Troubleshooting
+------------------------
 
-If schema.sql or seed.sql changes, apply them to Railway MySQL again.
+Registration fails:
+- Check Railway MySQL and backend DB variables.
 
-Recommended approach:
-Use the Node.js mysql2 driver from the server folder because older local MySQL CLI versions may fail against Railway MySQL.
+Frontend API calls fail:
+- Check VITE_API_URL on Vercel.
 
-Command pattern:
+Emotion detection fails:
+- Check camera permission and VITE_EMOTION_API_URL.
 
-cd server
-node -e "const fs=require('fs'); const mysql=require('mysql2/promise'); (async()=>{const c=await mysql.createConnection({host:'<public-host>',port:<public-port>,user:'root',password:'<password>',database:'railway',multipleStatements:true}); await c.query(fs.readFileSync('../database/schema.sql','utf8')); await c.query(fs.readFileSync('../database/seed.sql','utf8')); await c.end(); console.log('Schema and seed applied');})().catch(e=>{console.error(e.message); process.exit(1);});"
-
-
-13. Common Troubleshooting
---------------------------
-
-Problem:
-Registration fails.
-
-Likely cause:
-Backend cannot find the users table or database variables are wrong.
-
-Check:
-- Railway backend variables
-- Railway MySQL status
-- database/schema.sql applied successfully
-
-
-Problem:
-Frontend loads but API calls fail.
-
-Likely cause:
-VITE_API_URL was missing or pointed to localhost during production build.
-
-Fix:
-Redeploy frontend with:
-VITE_API_URL=https://feelthemusic-backend-production.up.railway.app/api
-
-
-Problem:
-Webcam emotion detection fails.
-
-Likely causes:
-- Browser camera permission denied
-- Emotion service is down
-- VITE_EMOTION_API_URL is wrong
-- DeepFace model download/startup is slow on first request
-
-Check:
-https://feelthemusic-emotion-production.up.railway.app/
-
-
-Problem:
-Emotion service returns 502.
-
-Likely cause:
-The Python app crashed.
-
-Check logs:
-railway logs --service feelthemusic-emotion --deployment
-
-Known fix already applied:
-The Dockerfile installs OpenCV runtime libraries, including libxcb1.
-
-
-14. Final Notes
----------------
-
-The project is now deployed across Vercel and Railway.
-
-The frontend communicates with:
-- Railway backend through VITE_API_URL
-- Railway emotion service through VITE_EMOTION_API_URL
-
-The backend communicates with:
-- Railway MySQL through internal Railway hostname mysql.railway.internal
-
-The real production secrets are stored in Railway and should not be committed to GitHub.
+Emotion service returns 502:
+- Check Railway logs for feelthemusic-emotion.
