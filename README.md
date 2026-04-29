@@ -2,6 +2,10 @@
 
 **FeelTheMusic** is an intelligent, context-aware web application designed to curate personalized music recommendations based on the user's emotional state and real-time environmental factors. Built with a robust modern tech stack (React frontend, Node.js/Express backend, and MySQL database), the platform dynamically analyzes user emotions, local weather, timezones, and language preferences to deliver a seamless listening experience. By automatically adapting to the user's current mood and surroundings, FeelTheMusic ensures the perfect soundtrack for any given moment.
 
+<img width="1600" height="893" alt="Image" src="https://github.com/user-attachments/assets/9b90fb00-18dc-4001-861b-f4448d136b56" />
+
+<img width="1600" height="893" alt="Image" src="https://github.com/user-attachments/assets/71510036-a360-4bab-9888-8ee832137e58" />
+
 ## Project Overview
 
 FeelTheMusic combines emotion detection, user preferences, and contextual signals to recommend music that fits the user's current state. The application includes a React/Vite frontend, an Express REST API, a MySQL database, and a Python FastAPI emotion-detection service powered by DeepFace.
