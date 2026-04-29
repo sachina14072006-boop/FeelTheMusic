@@ -1,37 +1,75 @@
-# Dependency directories
+# Dependencies
 node_modules/
+client/node_modules/
+server/node_modules/
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+client/.env
+client/.env.*
+server/.env
+server/.env.*
+emotion-service/.env
+emotion-service/.env.*
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
 
-# Logs
-logs
+# Logs and debug output
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+debug.log
 
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# React/Vite build output
+dist/
+build/
+out/
+client/dist/
+client/build/
 
-# OS metadata
+# Node.js runtime and cache files
+.npm/
+.pnpm-store/
+.yarn/
+coverage/
+*.tsbuildinfo
+
+# Python emotion service artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+
+# MySQL/database local artifacts
+*.sqlite
+*.sqlite3
+*.db
+*.dump
+*.sql.gz
+*.bak
+mysql-data/
+
+# Operating system artifacts
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# Build directories
-dist/
-build/
-out/
-
-# Editor directories and files
+# Editor and IDE files
 .vscode/
 .idea/
 *.suo
