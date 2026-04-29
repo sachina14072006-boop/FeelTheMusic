@@ -1,21 +1,24 @@
 # FeelTheMusic
 
-**FeelTheMusic** is an intelligent, context-aware web application designed to curate personalized music recommendations based on the user's emotional state and real-time environmental factors. Built with a robust modern tech stack (React frontend, Node.js/Express backend, and MySQL database), the platform dynamically analyzes user emotions, local weather, timezones, and language preferences to deliver a seamless listening experience. By automatically adapting to the user's current mood and surroundings, FeelTheMusic ensures the perfect soundtrack for any given moment.
+**FeelTheMusic** is an intelligent, context-aware web application that curates personalized music recommendations based on the user's emotional state and real-time context. It uses a React frontend, Node.js/Express backend, MySQL database, and a Python FastAPI emotion-detection service powered by DeepFace.
 
-<img width="1600" height="893" alt="Image" src="https://github.com/user-attachments/assets/9b90fb00-18dc-4001-861b-f4448d136b56" />
+<img width="1600" height="893" alt="FeelTheMusic preview" src="https://github.com/user-attachments/assets/9b90fb00-18dc-4001-861b-f4448d136b56" />
 
-## Project Overview
+## Live Deployment
 
-FeelTheMusic combines emotion detection, user preferences, and contextual signals to recommend music that fits the user's current state. The application includes a React/Vite frontend, an Express REST API, a MySQL database, and a Python FastAPI emotion-detection service powered by DeepFace.
+- **Frontend:** https://client-beta-wheat-71.vercel.app
+- **Backend API:** https://feelthemusic-backend-production.up.railway.app
+- **Emotion Service:** https://feelthemusic-emotion-production.up.railway.app
+- **Repository:** https://github.com/sachina14072006-boop/FeelTheMusic.git
 
 ## Key Features
 
-- Emotion-aware music recommendations based on webcam emotion detection.
-- Context-aware recommendation logic designed for weather, timezone, and language preferences.
-- User authentication with JWT-protected backend routes.
-- Song browsing, playlists, mood logs, ratings, and recommendation history.
-- Python emotion microservice using FastAPI, DeepFace, and OpenCV.
-- MySQL-backed persistence for users, songs, moods, playlists, ratings, and reports.
+- Webcam-based emotion detection.
+- Emotion-aware song recommendations.
+- User registration and login with JWT authentication.
+- Song library, playlists, mood logs, ratings, and reports.
+- MySQL-backed data persistence.
+- Separate Python emotion microservice using FastAPI, DeepFace, and OpenCV.
 
 ## Tech Stack
 
@@ -23,163 +26,128 @@ FeelTheMusic combines emotion detection, user preferences, and contextual signal
 - **Backend:** Node.js, Express, MySQL2, JWT, bcryptjs, CORS, dotenv
 - **Database:** MySQL
 - **Emotion Service:** Python, FastAPI, DeepFace, OpenCV, NumPy, Pydantic
-- **Tooling:** npm, pip, Git
+- **Deployment:** Vercel, Railway, Railway MySQL
+
+## Project Structure
+
+```text
+FeelTheMusic/
+|-- client/              # React/Vite frontend
+|-- server/              # Node.js/Express backend API
+|-- emotion-service/     # Python FastAPI emotion detection service
+|-- database/            # MySQL schema and seed files
+|-- DEPLOYMENT_GUIDE.txt # Short deployment notes
+|-- README.md
+`-- .gitignore
+```
 
 ## Prerequisites
 
-Install the following before running the project locally:
-
-- Node.js 18 or newer
+- Node.js 18+
 - npm
-- MySQL 8 or compatible MySQL server
-- Python 3.10 or newer
+- MySQL 8+
+- Python 3.10+
 - Git
 
-## Installation & Setup
+## Local Setup
 
-1. Clone the repository:
+Clone the repository:
 
-   ```bash
-   git clone https://github.com/sachina14072006-boop/Music-recommandation.git
-   cd Music-recommandation
-   ```
+```bash
+git clone https://github.com/sachina14072006-boop/FeelTheMusic.git
+cd FeelTheMusic
+```
 
-2. Install frontend dependencies:
+Install frontend dependencies:
 
-   ```bash
-   cd client
-   npm install
-   ```
+```bash
+cd client
+npm install
+```
 
-3. Install backend dependencies:
+Install backend dependencies:
 
-   ```bash
-   cd ../server
-   npm install
-   ```
+```bash
+cd ../server
+npm install
+```
 
-4. Install emotion service dependencies:
+Install emotion service dependencies:
 
-   ```bash
-   cd ../emotion-service
-   pip install -r requirements.txt
-   ```
+```bash
+cd ../emotion-service
+pip install -r requirements.txt
+```
 
-5. Create the backend environment file:
+## Environment Variables
 
-   ```bash
-   cd ../server
-   ```
+Create `server/.env`:
 
-   Create `server/.env` with your local values:
+```env
+PORT=5000
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_mysql_password
+DB_NAME=feelthemusic_db
+JWT_SECRET=replace_with_a_strong_secret
+```
 
-   ```env
-   PORT=5000
-   DB_HOST=localhost
-   DB_USER=root
-   DB_PASSWORD=your_mysql_password
-   DB_NAME=feelthemusic_db
-   JWT_SECRET=replace_with_a_strong_secret
-   ```
+Optional local frontend variables can be placed in `client/.env`:
 
-## Database Configuration
+```env
+VITE_API_URL=http://localhost:5000/api
+VITE_EMOTION_API_URL=http://localhost:8000
+```
 
-1. Sign in to MySQL:
+## Database Setup
 
-   ```bash
-   mysql -u root -p
-   ```
+Create the local database:
 
-2. Create the application database:
+```sql
+CREATE DATABASE feelthemusic_db;
+```
 
-   ```sql
-   CREATE DATABASE feelthemusic_db;
-   ```
+Apply schema and seed data from the project root:
 
-3. Load the schema and seed data from the project root:
+```bash
+mysql -u root -p feelthemusic_db < database/schema.sql
+mysql -u root -p feelthemusic_db < database/seed.sql
+```
 
-   ```bash
-   mysql -u root -p feelthemusic_db < database/schema.sql
-   mysql -u root -p feelthemusic_db < database/seed.sql
-   ```
+## Running Locally
 
-If your local `database/schema.sql` or `database/seed.sql` files are empty, create the tables expected by the backend controllers before starting the API. The backend queries expect tables for users, songs, emotions, mood logs, playlists, ratings, and reports.
-
-## Running the Application
-
-Start each service in its own terminal.
-
-Backend API:
+Start the backend:
 
 ```bash
 cd server
 npm run dev
 ```
 
-Emotion detection service:
+Start the emotion service:
 
 ```bash
 cd emotion-service
 uvicorn main:app --reload --port 8000
 ```
 
-Frontend development server:
+Start the frontend:
 
 ```bash
 cd client
 npm run dev
 ```
 
-By default, the frontend runs on Vite's local development URL and the backend API runs at `http://localhost:5000`.
+Default local URLs:
 
-## Folder Structure
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:5000`
+- Emotion Service: `http://localhost:8000`
 
-```text
-FeelTheMusic/
-|-- client/              # React/Vite frontend
-|   |-- public/          # Static assets, covers, and audio files
-|   |-- src/             # React pages, components, services, and styles
-|   |-- index.html       # Frontend HTML entry point
-|   `-- package.json     # Frontend dependencies and scripts
-|-- server/              # Node.js/Express backend API
-|   |-- src/             # Routes, controllers, middleware, and config
-|   `-- package.json     # Backend dependencies and scripts
-|-- emotion-service/     # Python FastAPI emotion detection service
-|   |-- main.py          # DeepFace emotion detection API
-|   `-- requirements.txt # Python dependencies
-|-- database/            # MySQL schema and seed scripts
-|   |-- schema.sql
-|   `-- seed.sql
-|-- .gitignore
-`-- README.md
-```
+## Deployment Summary
 
-## Git Cache Cleanup
+- The frontend is deployed on **Vercel**.
+- The backend API is deployed on **Railway**.
+- The MySQL database is hosted on **Railway MySQL**.
+- The emotion service is deployed on **Railway** using a Dockerfile because OpenCV requires Linux runtime libraries.
 
-If ignored files were committed before `.gitignore` was updated, remove them from Git's index while keeping them on disk:
-
-```bash
-git rm -r --cached .
-git add .
-git commit -m "chore: refresh tracked files after gitignore update"
-```
-
-## GitHub Upload Commands
-
-Run these commands from the project root:
-
-```bash
-git init
-git branch -M main
-git add .
-git commit -m "chore: prepare FeelTheMusic for production upload"
-git remote add origin https://github.com/sachina14072006-boop/Music-recommandation.git
-git push -u origin main
-```
-
-If the `origin` remote already exists, update it instead:
-
-```bash
-git remote set-url origin https://github.com/sachina14072006-boop/Music-recommandation.git
-git push -u origin main
-```
+For more details, see `DEPLOYMENT_GUIDE.txt`.
