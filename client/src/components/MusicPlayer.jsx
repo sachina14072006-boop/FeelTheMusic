@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
-function MusicPlayer({ currentSong }) {
+function MusicPlayer({ currentSong, onPrevious, onNext, hasMultipleSongs = false }) {
     const audioRef = useRef(null);
     const [audioError, setAudioError] = useState("");
 
     useEffect(() => {
-        setAudioError("");
-
         if (audioRef.current && currentSong && currentSong.song_url) {
             audioRef.current.load();
             audioRef.current.play().catch(() => { });
@@ -42,10 +40,37 @@ function MusicPlayer({ currentSong }) {
 
             {currentSong.song_url ? (
                 <>
+                    <div className="player-controls">
+                        <button
+                            type="button"
+                            onClick={onPrevious}
+                            disabled={!hasMultipleSongs}
+                            aria-label="Previous track"
+                            title="Previous track"
+                        >
+                            Previous
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onNext}
+                            disabled={!hasMultipleSongs}
+                            aria-label="Next track"
+                            title="Next track"
+                        >
+                            Next
+                        </button>
+                    </div>
+
                     <audio
                         ref={audioRef}
                         controls
                         className="audio-player"
+                        onLoadStart={() => setAudioError("")}
+                        onEnded={() => {
+                            if (hasMultipleSongs) {
+                                onNext();
+                            }
+                        }}
                         onError={() =>
                             setAudioError("Audio could not be loaded. Check the song file/path.")
                         }

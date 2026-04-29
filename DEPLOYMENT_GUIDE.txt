@@ -43,6 +43,8 @@ https://github.com/sachina14072006-boop/FeelTheMusic.git
 - Created MySQL schema and seed data.
 - Replaced localhost API URLs with Vite environment variables.
 - Improved webcam video size and alignment.
+- Randomized the first recommended track so webcam recommendations do not always start with the same song.
+- Added Previous and Next controls to the recommendation music player.
 - Added a Dockerfile for the emotion service so OpenCV works on Railway.
 
 

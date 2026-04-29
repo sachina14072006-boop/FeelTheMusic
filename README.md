@@ -14,7 +14,7 @@
 ## Key Features
 
 - Webcam-based emotion detection.
-- Emotion-aware song recommendations.
+- Emotion-aware song recommendations with rotating start tracks and player navigation.
 - User registration and login with JWT authentication.
 - Song library, playlists, mood logs, ratings, and reports.
 - MySQL-backed data persistence.

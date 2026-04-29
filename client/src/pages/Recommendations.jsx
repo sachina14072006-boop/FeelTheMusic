@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "../services/api";
 import SongCard from "../components/SongCard";
 import WebcamDetector from "../components/WebcamDetector";
@@ -13,6 +13,8 @@ function Recommendations() {
     const [loading, setLoading] = useState(false);
     const [infoMessage, setInfoMessage] = useState("");
     const [currentSong, setCurrentSong] = useState(null);
+    const [currentSongIndex, setCurrentSongIndex] = useState(-1);
+    const lastAutoSongIdRef = useRef(null);
 
     const user = JSON.parse(localStorage.getItem("user") || "null");
 
@@ -47,6 +49,7 @@ function Recommendations() {
             setInfoMessage("");
             setSongs([]);
             setCurrentSong(null);
+            setCurrentSongIndex(-1);
 
             await api.post("/mood-logs", {
                 user_id: user.user_id,
@@ -56,20 +59,40 @@ function Recommendations() {
             });
 
             const res = await api.get(`/songs/recommendations/${emotionId}`);
-            setSongs(res.data);
+            const recommendedSongs = res.data || [];
+            setSongs(recommendedSongs);
 
-            if (res.data.length > 0) {
-                setCurrentSong(res.data[0]);
+            if (recommendedSongs.length > 0) {
+                const playableSongs = recommendedSongs.filter((song) => song.song_url);
+                const startPool = playableSongs.length > 0 ? playableSongs : recommendedSongs;
+                let startSong = startPool[Math.floor(Math.random() * startPool.length)];
+
+                if (startPool.length > 1 && startSong.song_id === lastAutoSongIdRef.current) {
+                    const alternatives = startPool.filter(
+                        (song) => song.song_id !== lastAutoSongIdRef.current
+                    );
+                    startSong = alternatives[Math.floor(Math.random() * alternatives.length)];
+                }
+
+                const startIndex = recommendedSongs.findIndex(
+                    (song) => song.song_id === startSong.song_id
+                );
+
+                lastAutoSongIdRef.current = startSong.song_id;
+                setCurrentSong(startSong);
+                setCurrentSongIndex(startIndex);
             }
 
-            if (res.data.length === 0) {
+            if (recommendedSongs.length === 0) {
                 setInfoMessage("No songs found for this emotion.");
             } else {
-                setInfoMessage(`Found ${res.data.length} recommended song(s).`);
+                setInfoMessage(`Found ${recommendedSongs.length} recommended song(s).`);
             }
         } catch (error) {
             console.error(error);
             setSongs([]);
+            setCurrentSong(null);
+            setCurrentSongIndex(-1);
             setInfoMessage("Failed to fetch recommendations.");
         } finally {
             setLoading(false);
@@ -113,7 +136,35 @@ function Recommendations() {
     };
 
     const handlePlaySong = (song) => {
+        const songIndex = songs.findIndex((item) => item.song_id === song.song_id);
         setCurrentSong(song);
+        setCurrentSongIndex(songIndex);
+    };
+
+    const playSongAtIndex = (index) => {
+        if (songs.length === 0) {
+            return;
+        }
+
+        const normalizedIndex = (index + songs.length) % songs.length;
+        setCurrentSong(songs[normalizedIndex]);
+        setCurrentSongIndex(normalizedIndex);
+    };
+
+    const nextTrack = () => {
+        if (songs.length === 0) {
+            return;
+        }
+
+        playSongAtIndex(currentSongIndex >= 0 ? currentSongIndex + 1 : 0);
+    };
+
+    const previousTrack = () => {
+        if (songs.length === 0) {
+            return;
+        }
+
+        playSongAtIndex(currentSongIndex >= 0 ? currentSongIndex - 1 : songs.length - 1);
     };
 
     if (!user) {
@@ -170,7 +221,12 @@ function Recommendations() {
                 {infoMessage && <p>{infoMessage}</p>}
             </div>
 
-            <MusicPlayer currentSong={currentSong} />
+            <MusicPlayer
+                currentSong={currentSong}
+                onPrevious={previousTrack}
+                onNext={nextTrack}
+                hasMultipleSongs={songs.length > 1}
+            />
 
             <div className="grid">
                 {songs.map((song) => (
