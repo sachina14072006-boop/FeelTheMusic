@@ -70,7 +70,9 @@ function WebcamDetector({ onEmotionDetected }) {
 
             const imageBase64 = canvas.toDataURL("image/jpeg");
 
-            const res = await axios.post("http://localhost:8000/detect-emotion", {
+            const emotionApiUrl = import.meta.env.VITE_EMOTION_API_URL || "http://localhost:8000";
+
+            const res = await axios.post(`${emotionApiUrl}/detect-emotion`, {
                 image: imageBase64
             });
 
@@ -100,7 +102,7 @@ function WebcamDetector({ onEmotionDetected }) {
     }, []);
 
     return (
-        <div className="card glass">
+        <div className="card glass webcam-card">
             <h3>Webcam Emotion Detection</h3>
 
             <div className={`status-badge ${status.toLowerCase()}`}>

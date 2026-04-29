@@ -319,12 +319,26 @@ button:disabled {
   flex-wrap: wrap;
 }
 
+.webcam-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.webcam-card .card-actions {
+  justify-content: center;
+}
+
 .webcam-video {
   width: 100%;
-  max-width: 420px;
+  max-width: 820px;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
   border-radius: 18px;
   background: #020617;
-  margin-top: 10px;
+  margin: 12px auto 0;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
