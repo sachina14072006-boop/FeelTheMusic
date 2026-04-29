@@ -4,8 +4,6 @@
 
 <img width="1600" height="893" alt="Image" src="https://github.com/user-attachments/assets/9b90fb00-18dc-4001-861b-f4448d136b56" />
 
-<img width="1600" height="893" alt="Image" src="https://github.com/user-attachments/assets/71510036-a360-4bab-9888-8ee832137e58" />
-
 ## Project Overview
 
 FeelTheMusic combines emotion detection, user preferences, and contextual signals to recommend music that fits the user's current state. The application includes a React/Vite frontend, an Express REST API, a MySQL database, and a Python FastAPI emotion-detection service powered by DeepFace.
