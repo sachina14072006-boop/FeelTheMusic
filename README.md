@@ -9,7 +9,7 @@
 - **Frontend:** https://client-beta-wheat-71.vercel.app
 - **Backend API:** https://feelthemusic-backend-production.up.railway.app
 - **Emotion Service:** https://feelthemusic-emotion-production.up.railway.app
-- **Repository:** https://github.com/sachina14072006-boop/FeelTheMusic.git
+
 
 ## Key Features
 
